@@ -13,7 +13,7 @@
 using namespace std;
 
 SimpleBK::SimpleBK(AbstractGraph &graph) :
-bk_graph(RigorGraph(graph.spixels.size(), graph.pairwise.size())) {
+bk_graph(RigorGraph(graph.spixels.size(), graph.pairwise->size())) {
         
     bk_graph.add_node(graph.spixels.size());
     
@@ -23,7 +23,7 @@ bk_graph(RigorGraph(graph.spixels.size(), graph.pairwise.size())) {
         bk_graph.add_tweights(i, unary_pair.first, unary_pair.second);
     }
     
-    for (pw_edge edge: graph.pairwise) {
+    for (pw_edge edge: *graph.pairwise) {
         bk_graph.add_edge(edge.a, edge.b, edge.w, edge.w);
     }
 }

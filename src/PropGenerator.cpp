@@ -122,9 +122,9 @@ void PropGenerator::generate(fs::path filename){
         cv::imshow("Input Image", image);
     }
     
-//    cv::Mat edges = gradient(image);
-    cv::Mat edges = cv::imread("/Users/ajmalkunnummal/Pictures/peppers_str_edges_fat.png");
-    edges = struct_edges(edges);
+    cv::Mat edges = gradient(image);
+    //cv::Mat edges = cv::imread("/Users/ajmalkunnummal/Pictures/peppers_str_edges_fat.png");
+    //edges = struct_edges(edges);
     
     if(params.debug){
         cout << "Ran edge detection" << endl;
