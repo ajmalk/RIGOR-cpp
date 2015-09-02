@@ -8,6 +8,6 @@ IEEE Computer Vision and Pattern Recognition (CVPR) 2014
 
 This code is accompanied with a [LICENSE](rigor/src/master/LICENSE)
 
-For information on updates and bug fixes please email "a[Last name of first author]@cc.gatech.edu" with the subject "CVPR 2014 RIGOR Code" to be added to the mailing list.
-
 --------------------------------------------------------------------
+
+This fork is maintained by Ajmal Kunnummal
