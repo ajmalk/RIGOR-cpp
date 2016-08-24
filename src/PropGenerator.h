@@ -22,6 +22,7 @@ public:
    PropGenerator();
    PropGenerator(Parameters &params);
    void generate(fs::path filename);
+   void generate_pix(fs::path filename);
 };
 
 #endif /* defined(__Rigor__PropGenerator__) */

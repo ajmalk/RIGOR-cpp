@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
             std::cerr << desc << std::endl;
             return 0;
         }
-        
+
         po::notify(vm);
         
         fs::path im_filepath = vm["imfilepath"].as<fs::path>();
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
         Parameters params = Parameters::getDebug();
         PropGenerator generator = PropGenerator(params);
         
-        generator.generate(im_filepath);
+        generator.generate_pix(im_filepath);
         
         
     } catch (po::error& e) {

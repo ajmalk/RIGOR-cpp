@@ -46,7 +46,7 @@ void print_set(set<int> vec){
     cout << "}" << endl;
 }
 
-void SPImage::build_pairwise_edges(){
+void SPImage::build_pairwise_edges() {
     auto edge_hash = [this](const pair<int, int> &key) { return key.first * this->spixels.size() + key.second; };
     std::unordered_map< pair<int, int>, vector<edgew>, decltype(edge_hash) > b_pixels(0, edge_hash);
     b_pixels.reserve(spixels.size() * 10);
@@ -97,20 +97,21 @@ void SPImage::build_pairwise_edges(){
         }
     }
     
-    for ( int i = 0; i < pw_params.size(); i++ ){
+    for ( int i = 0; i < pw_params.size(); i++ ) {
         this->pairwise.emplace_back();
         this->pairwise[i].reserve(b_pixels.size());
     }
     
-    for(auto const & edge: b_pixels){
+    for(auto const & edge: b_pixels) {
         for (int i = 0; i < pw_params.size(); i++) {
             PWEdges &edges = this->pairwise[i];
             auto &params = pw_params[i];
             edgew avg = accumulate(edge.second.begin(), edge.second.end(), 0.0) / edge.second.size();
             edgew inv = exp( - double(avg) / 2.0 / params.sig_s / params.sig_s );
             edgew ev = (params.Pc * inv + params.Pw + 0.007) * params.Po;
+//            ev = 0;
 //            ev2 = 100;
-            edges.emplace_back( pw_edge {edge.first.first, edge.first.second, ev} );
+            edges.emplace_back( pw_edge {edge.first.first, edge.first.second, inv} );
 //            cout << edge.first.first << " " << edge.first.second << " " << avg << endl;
 //            print_vector<double>(edge.second);
         }

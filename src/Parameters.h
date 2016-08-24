@@ -15,28 +15,28 @@ class Parameters {
 	friend class PropGenerator;
 
 	bool debug = false;
-    
+
     int num_sp = 1000;
-    
+
     double compactness = 20;
-    
+
     int seeds = 25;
-    
+
     int seed_radius = 5;
-    
+
     float scale_color_unary = 220;
-    
+
     std::vector<create_graph_func> graph_types = {
-        FuxinGraphs::uniform_intern_graph,
-        FuxinGraphs::uniform_extern_graph,
-        FuxinGraphs::uniform_extern2_graph,
+//        FuxinGraphs::uniform_intern_graph,
+//        FuxinGraphs::uniform_extern_graph,
+//        FuxinGraphs::uniform_extern2_graph,
         FuxinGraphs::color_intern_graph,
-        FuxinGraphs::color_extern_graph,
-        FuxinGraphs::color_extern2_graph,
+//        FuxinGraphs::color_extern_graph,
+//        FuxinGraphs::color_extern2_graph,
     };
-    
+
     std::vector<PWParams> pw_params = FuxinGraphs::PWPARAMS;
-    
+
     Parameters() {}
 
 public:
@@ -48,7 +48,7 @@ public:
     inline static Parameters getDebug() {
 	    Parameters param = Parameters();
 	    param.debug = true;
-	    param.seeds = 64;
+	    param.seeds = 1;
 	    param.seed_radius = 1;
 	    param.num_sp = 1000;
 	    return param;

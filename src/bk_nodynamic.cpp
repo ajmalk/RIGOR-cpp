@@ -8,7 +8,7 @@
 using namespace std;
 
 vector<bool> nodynamic_param_maxflow(vector< unique_ptr<AbstractGraph> > &graphs) {
-    const int num_sp = graphs[0]->spixels.size();
+    const int num_sp = graphs[0]->image->getNumPixels();
     vector<bool> cuts;
     cuts.reserve(num_sp * graphs[0]->lambdas.size() * graphs.size());
     
@@ -18,7 +18,7 @@ vector<bool> nodynamic_param_maxflow(vector< unique_ptr<AbstractGraph> > &graphs
 //        cout << graph->type<< endl;
         for (int i = 0; i < graph->lambdas.size(); i++) {
     //        cout << lambda.first << " " << lambda.second << " ";
-            GraphType bk_graph = GraphType(num_sp, graph->pairwise->size());
+            GraphType bk_graph = GraphType(num_sp, graph->getNumPairwise());
             bk_graph.add_node(num_sp);
             
             /* add unary capacity edges (t-links) */
@@ -29,7 +29,9 @@ vector<bool> nodynamic_param_maxflow(vector< unique_ptr<AbstractGraph> > &graphs
             }
             
             /* add pairwise capacity edges */
-            for (pw_edge edge: *graph->pairwise) {
+            AbstractGraph::PairwiseIterator pairwiseIt = graph->get_pairwise_it();
+            for (int i = 0; i < graph->getNumPairwise(); pairwiseIt++, i++) {
+                pw_edge edge = *pairwiseIt;
                 bk_graph.add_edge(edge.a, edge.b, edge.w, edge.w);
             }
             
@@ -61,10 +63,10 @@ vector<bool> nodynamic_param_maxflow(vector< unique_ptr<AbstractGraph> > &graphs
             }
     //        cout << " " << all_eq << endl;
             
-            if(all_src) {
-                cuts.erase(cuts.end() - num_sp, cuts.end());
-                break;
-            }
+//            if(all_src) {
+//                cuts.erase(cuts.end() - num_sp, cuts.end());
+//                break;
+//            }
             
             if(all_eq) {
                 cuts.erase(cuts.end() - num_sp, cuts.end());

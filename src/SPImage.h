@@ -10,9 +10,12 @@
 #define __Rigor__SPImage__
 
 #include <opencv2/core/core.hpp>
-#include "AbstractGraph.h"
+#include "AbstractImage.h"
+#include <vector>
+#include <set>
 
-class SPImage {
+
+class SPImage: public AbstractImage {
 private:
     
     cv::Mat *image, *sp_im, *edges;
@@ -28,7 +31,7 @@ private:
 
 public:
     std::vector<spixel> spixels;
-    std::vector< PWEdges > pairwise;
+    std::vector<PWEdges> pairwise;
 
     SPImage(cv::Mat &image, cv::Mat &sp_im, cv::Mat &edges, int num_sp);
 
@@ -39,6 +42,30 @@ public:
     cv::Mat seeds_to_sp_im(std::vector< std::set<int> > &seeds);
     cv::Mat cut_to_image(GraphCut& cut);
     cv::Mat cut_to_image(std::vector<bool>::iterator cut);
+
+    inline int getNumPixels(){
+        return spixels.size();
+    }
+    inline int getNumPairwise() {
+        return pairwise[0].size();
+    }
+
+    inline pw_edge get_pairwise(int set, int index) {
+        return pairwise[set][index];
+    }
+
+    inline int get_size(int p) {
+        return spixels[p].size;
+    }
+
+    inline color_t get_color(int p) {
+        return spixels[p].color;
+    }
+
+    inline bool get_ext(int p) {
+        return spixels[p].ext;
+    }
+
 };
 
 #endif /* defined(__Rigor__SPImage__) */

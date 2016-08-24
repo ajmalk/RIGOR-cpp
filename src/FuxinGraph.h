@@ -19,7 +19,7 @@ namespace FuxinGraphs {
 
     static const std::vector<PWParams> PWPARAMS = { { 1, 3.5, 1e-3, 1000}, { 1, 3.5, 1e-3, 1000} };
     
-    static const std::array< float, 2 > lambda_bounds = { { 20., 150. } };
+    static const std::array< float, 2 > lambda_bounds = { { 20., 150000000. } };
     static const int NLAMBDAS = 20;
     static const float SMALLEST_LAMBDA = 0.001;
     
@@ -57,7 +57,7 @@ namespace FuxinGraphs {
         std::generate_n(std::back_inserter(lambdas[UNIFORM]), NLAMBDAS, Logspace<float>(baseu));
         std::generate_n(std::back_inserter(lambdas[COLOR]), NLAMBDAS, Logspace<float>(basec));
         
-//        print_vector(lambdas[COLOR ]);
+        print_vector(lambdas[COLOR]);
         
         return lambdas;
     }
@@ -66,14 +66,14 @@ namespace FuxinGraphs {
 
     class UniformInternGraph : public AbstractGraph {
     public:
-        UniformInternGraph(Seed &seed, SPixels &spixels, std::vector<PWEdges> &pairwise) :
-        AbstractGraph(seed, spixels, &pairwise[UNIFORM], "UniformInternGraph", fuxin_lambdas[UNIFORM]) {}
+        UniformInternGraph(Seed &seed, AbstractImage *image) :
+        AbstractGraph(seed, image, UNIFORM, "UniformInternGraph", fuxin_lambdas[UNIFORM]) {}
         
         inline edgew get_lambda_s(int sp) {
-            return !seed.count(sp) * spixels[sp].size;
+            return !seed.count(sp) * image->get_size(sp);
         }
         inline edgew get_lambda_t(int sp) {
-            return !seed.count(sp) * spixels[sp].size / 2;
+            return !seed.count(sp) * image->get_size(sp) / 2;
         }
         inline edgew get_nonlambda_s(int sp) {
             return seed.count(sp) * infinity;
@@ -85,33 +85,33 @@ namespace FuxinGraphs {
 
     class UniformExternGraph : public AbstractGraph {
     public:
-        UniformExternGraph(Seed &seed, SPixels &spixels, std::vector<PWEdges> &pairwise) :
-            AbstractGraph(seed, spixels, &pairwise[UNIFORM], "UniformExternGraph", fuxin_lambdas[UNIFORM]) {  }
+        UniformExternGraph(Seed &seed, AbstractImage *image) :
+            AbstractGraph(seed, image, UNIFORM, "UniformExternGraph", fuxin_lambdas[UNIFORM]) {  }
         
         inline edgew get_lambda_s(int sp) {
-            return !seed.count(sp) * spixels[sp].ext * spixels[sp].size;
+            return !seed.count(sp) * image->get_ext(sp) * image->get_size(sp);
         }
         inline edgew get_lambda_t(int sp) {
-            return !seed.count(sp) * spixels[sp].size / 256;
+            return !seed.count(sp) * image->get_size(sp) / 256;
         }
         inline edgew get_nonlambda_s(int sp) {
             return seed.count(sp) * infinity;
         }
         inline edgew get_nonlambda_t(int sp) {
-            return spixels[sp].ext;
+            return image->get_ext(sp);
         }
     };
 
     class UniformExtern2Graph : public AbstractGraph {
     public:
-        UniformExtern2Graph(Seed &seed, SPixels &spixels, std::vector<PWEdges> &pairwise) :
-            AbstractGraph(seed, spixels, &pairwise[UNIFORM], "UniformExtern2Graph", fuxin_lambdas[UNIFORM]) {  }
+        UniformExtern2Graph(Seed &seed, AbstractImage *image) :
+            AbstractGraph(seed, image, UNIFORM, "UniformExtern2Graph", fuxin_lambdas[UNIFORM]) {  }
         
         inline edgew get_lambda_s(int sp) {
-            return !seed.count(sp) * spixels[sp].size;
+            return !seed.count(sp) * image->get_size(sp);
         }
         inline edgew get_lambda_t(int sp) {
-            return !seed.count(sp) * spixels[sp].size / 256;
+            return !seed.count(sp) * image->get_size(sp) / 256;
         }
         inline edgew get_nonlambda_s(int sp) {
             return seed.count(sp) * infinity;
@@ -125,8 +125,8 @@ namespace FuxinGraphs {
     private:
         float scaling = 220;
     public:
-        ColorInternGraph(Seed &seed, SPixels &spixels, std::vector<PWEdges> &pairwise) :
-            AbstractGraph(seed, spixels, &pairwise[COLOR], "ColorInternGraph", fuxin_lambdas[COLOR]) {  }
+        ColorInternGraph(Seed &seed, AbstractImage *image) :
+            AbstractGraph(seed, image, COLOR, "ColorInternGraph", fuxin_lambdas[COLOR]) {  }
         
         inline edgew get_lambda_s(int sp) {
             return 0;
@@ -135,7 +135,7 @@ namespace FuxinGraphs {
             return !seed.count(sp);
         }
         inline edgew get_nonlambda_s(int sp) {
-            return seed.count(sp) * infinity + !seed.count(sp) * this->seed_inv_distance(sp, AbstractGraph::eucl_distance) * scaling;
+            return seed.count(sp) * infinity;// + !seed.count(sp) * seed_inv_distance(sp, AbstractGraph::eucl_distance) * scaling;
         }
         inline edgew get_nonlambda_t(int sp) {
             return 0;
@@ -144,49 +144,48 @@ namespace FuxinGraphs {
 
     class ColorExternGraph : public AbstractGraph {
     public:
-        ColorExternGraph(Seed &seed, SPixels &spixels, std::vector<PWEdges> &pairwise) :
-            AbstractGraph(seed, spixels, &pairwise[COLOR], "ColorExternGraph", fuxin_lambdas[COLOR]) { }
+        ColorExternGraph(Seed &seed, AbstractImage *image) :
+            AbstractGraph(seed, image, COLOR, "ColorExternGraph", fuxin_lambdas[COLOR]) { }
         
         inline edgew get_lambda_s(int sp) {
-            return !seed.count(sp) * spixels[sp].size;
+            return !seed.count(sp) * image->get_size(sp);
         }
         inline edgew get_lambda_t(int sp) {
-            return !seed.count(sp) * spixels[sp].size * !spixels[sp].ext;
+            return !seed.count(sp) * image->get_size(sp) * !image->get_ext(sp);
         }
         inline edgew get_nonlambda_s(int sp) {
-            return seed.count(sp) * infinity + !seed.count(sp) * this->seed_inv_distance(sp, AbstractGraph::eucl_distance);
+            return seed.count(sp) * infinity + !seed.count(sp) * seed_inv_distance(sp, AbstractGraph::eucl_distance);
         }
         inline edgew get_nonlambda_t(int sp) {
-            return !seed.count(sp) * ( !spixels[sp].ext * this->seed_inv_distance(sp, AbstractGraph::eucl_distance) + spixels[sp].ext);
+            return !seed.count(sp) * ( !image->get_ext(sp) * seed_inv_distance(sp, AbstractGraph::eucl_distance) + image->get_ext(sp));
         }
     };
 
     class ColorExtern2Graph : public AbstractGraph {
     public:
-        ColorExtern2Graph(Seed &seed, SPixels &spixels, std::vector<PWEdges> &pairwise) :
-            AbstractGraph(seed, spixels, &pairwise[COLOR], "ColorExtern2Graph", fuxin_lambdas[COLOR] ) { }
+        ColorExtern2Graph(Seed &seed, AbstractImage *image) :
+            AbstractGraph(seed, image, COLOR, "ColorExtern2Graph", fuxin_lambdas[COLOR] ) { }
         
         inline edgew get_lambda_s(int sp) {
-            return !seed.count(sp) * spixels[sp].size;
+            return !seed.count(sp) * image->get_size(sp);
         }
         inline edgew get_lambda_t(int sp) {
-            return !seed.count(sp) * spixels[sp].size;
+            return !seed.count(sp) * image->get_size(sp);
         }
         inline edgew get_nonlambda_s(int sp) {
-            return seed.count(sp) * infinity + !seed.count(sp) * this->seed_inv_distance(sp, AbstractGraph::eucl_distance);
+            return seed.count(sp) * infinity + !seed.count(sp) * seed_inv_distance(sp, AbstractGraph::eucl_distance);
         }
         inline edgew get_nonlambda_t(int sp) {
-            return !seed.count(sp) * this->seed_inv_distance(sp, AbstractGraph::eucl_distance);
+            return !seed.count(sp) * seed_inv_distance(sp, AbstractGraph::eucl_distance);
         }
     };
 
-    std::unique_ptr<AbstractGraph> uniform_intern_graph  ( Seed &seed, SPixels &spixels, std::vector<PWEdges> &pairwise );
-    std::unique_ptr<AbstractGraph> uniform_extern_graph  ( Seed &seed, SPixels &spixels, std::vector<PWEdges> &pairwise );
-    std::unique_ptr<AbstractGraph> uniform_extern2_graph ( Seed &seed, SPixels &spixels, std::vector<PWEdges> &pairwise );
-    std::unique_ptr<AbstractGraph> color_intern_graph    ( Seed &seed, SPixels &spixels, std::vector<PWEdges> &pairwise );
-    std::unique_ptr<AbstractGraph> color_extern_graph    ( Seed &seed, SPixels &spixels, std::vector<PWEdges> &pairwise );
-    std::unique_ptr<AbstractGraph> color_extern2_graph   ( Seed &seed, SPixels &spixels, std::vector<PWEdges> &pairwise );
+    std::unique_ptr<AbstractGraph> uniform_intern_graph  ( Seed &seed, AbstractImage *image );
+    std::unique_ptr<AbstractGraph> uniform_extern_graph  ( Seed &seed, AbstractImage *image );
+    std::unique_ptr<AbstractGraph> uniform_extern2_graph ( Seed &seed, AbstractImage *image );
+    std::unique_ptr<AbstractGraph> color_intern_graph    ( Seed &seed, AbstractImage *image );
+    std::unique_ptr<AbstractGraph> color_extern_graph    ( Seed &seed, AbstractImage *image );
+    std::unique_ptr<AbstractGraph> color_extern2_graph   ( Seed &seed, AbstractImage *image );
 };
-
 
 #endif
